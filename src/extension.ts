@@ -25,8 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
         const line = document.lineAt(position.line);
         let contents = [line.text];
         // Matches a semver package(i.e: django = "^3.1.0")
-        // FIXME: packages with versions such as "^0.3"
-        const re = /^([\w-]+) = "(?:[<>^])?(?:<=)?(?:>=)?([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"$/i;
+        const re = /^([\w-]+) = "(?:[<>^])?(?:<=)?(?:>=)?([0-9]+)\.([0-9]+)(\.([0-9]+))?(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"$/i;
         if (line.text.match(re)) {
           const split = line.text.split(" ");
           const name = split[0];

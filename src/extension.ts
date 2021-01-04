@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
     "extension.poetryVscode",
     () => {
       // Display a message box to the user
-      vscode.window.showInformationMessage("vscode-poetry activated!");
+      vscode.window.showInformationMessage("poetry-vscode activated!");
     }
   );
 
@@ -33,7 +33,9 @@ export function activate(context: vscode.ExtensionContext) {
           const version = split[2].replace(/[<>=^"']*/gi, "");
           const latest = await getPypiVersion(name);
           // TODO: get installed version
-          contents = [`Package: ${name} - Installed: ${version} - Latest: ${latest}`];
+          contents = [
+            `Package: ${name} - Installed: ${version} - Latest: ${latest}`,
+          ];
         }
         return {
           contents: contents,

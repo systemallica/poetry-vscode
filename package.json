@@ -12,14 +12,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.poetryVscode"
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "extension.poetryVscode",
-				"title": "Activate poetry-vscode"
+				"title": "Check poetry-vscode status"
 			}
 		]
 	},

@@ -28,7 +28,6 @@ export function activate(context: vscode.ExtensionContext) {
           const name = split[0];
           const installed = await getInstalledVersion(name, document.uri.path);
           const latest = await getPypiVersion(name);
-          // TODO: get installed version
           contents = [
             `Package: ${name} - Installed: ${installed} - Latest: ${latest}`,
           ];
@@ -45,7 +44,6 @@ async function getInstalledVersion(
   name: string,
   filepath: string
 ): Promise<string> {
-  // Get installed version
   const cwd = path.dirname(filepath);
   const pipPath = path.join(cwd, ".venv/bin/pip");
   let version = "not installed";

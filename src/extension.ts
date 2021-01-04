@@ -45,6 +45,7 @@ async function getInstalledVersion(
   filepath: string
 ): Promise<string> {
   const cwd = path.dirname(filepath);
+  // TODO: get pip from currently activated venv
   const pipPath = path.join(cwd, ".venv/bin/pip");
   let version = "not installed";
   try {

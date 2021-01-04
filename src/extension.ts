@@ -1,5 +1,8 @@
 import * as vscode from "vscode";
 import fetch from "node-fetch";
+import util = require("util");
+import path = require("path");
+const exec = util.promisify(require("child_process").exec);
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
@@ -23,11 +26,11 @@ export function activate(context: vscode.ExtensionContext) {
         if (line.text.match(re)) {
           const split = line.text.split(" ");
           const name = split[0];
-          const version = split[2].replace(/[<>=^"']*/gi, "");
+          const installed = await getInstalledVersion(name, document.uri.path);
           const latest = await getPypiVersion(name);
           // TODO: get installed version
           contents = [
-            `Package: ${name} - Installed: ${version} - Latest: ${latest}`,
+            `Package: ${name} - Installed: ${installed} - Latest: ${latest}`,
           ];
         }
         return {
@@ -36,6 +39,25 @@ export function activate(context: vscode.ExtensionContext) {
       },
     }
   );
+}
+
+async function getInstalledVersion(
+  name: string,
+  filepath: string
+): Promise<string> {
+  // Get installed version
+  const cwd = path.dirname(filepath);
+  const pipPath = path.join(cwd, ".venv/bin/pip");
+  let version = "not installed";
+  try {
+    const { stdout, _ } = await exec(`${pipPath} show ${name}`, {
+      cwd: `${cwd}`,
+    });
+    version = stdout.split("\n")[1].replace("Version: ", "");
+  } catch (e) {
+    console.error(e);
+  }
+  return version;
 }
 
 async function getPypiVersion(name: string): Promise<string> {

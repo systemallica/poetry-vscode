@@ -5,6 +5,7 @@ import path = require("path");
 const exec = util.promisify(require("child_process").exec);
 
 export function activate(context: vscode.ExtensionContext) {
+const RE = /^([\w-]+) = "(?:[<>^])?(?:<=)?(?:>=)?([0-9]+)\.([0-9]+)(\.([0-9]+))?(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"$/i;
   const disposable = vscode.commands.registerCommand(
     "extension.poetryVscode",
     () => {
@@ -14,6 +15,16 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
+  async function getLineInfo(
+    line: vscode.TextLine,
+    document: vscode.TextDocument
+  ) {
+    const split = line.text.split(" ");
+    const name = split[0];
+    const installed = await getInstalledVersion(name, document.fileName);
+    const latest = await getPypiVersion(name);
+    return { installed, latest };
+  }
   // Display a text box on hover inside pyproject.toml files
   vscode.languages.registerHoverProvider(
     { pattern: "**/pyproject.toml" },
@@ -22,12 +33,10 @@ export function activate(context: vscode.ExtensionContext) {
         const line = document.lineAt(position.line);
         let contents = [line.text];
         // Matches a semver package(i.e: django = "^3.1.0")
-        const re = /^([\w-]+) = "(?:[<>^])?(?:<=)?(?:>=)?([0-9]+)\.([0-9]+)(\.([0-9]+))?(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?"$/i;
-        if (line.text.match(re)) {
+        if (line.text.match(RE)) {
           const split = line.text.split(" ");
           const name = split[0];
-          const installed = await getInstalledVersion(name, document.uri.path);
-          const latest = await getPypiVersion(name);
+          const { installed, latest } = await getLineInfo(line, document);
           contents = [
             `Package: ${name} - Installed: ${installed} - Latest: ${latest}`,
           ];
